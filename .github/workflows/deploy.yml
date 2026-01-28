@@ -28,8 +28,9 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o publish
+     - name: dotnet publish
+       run: dotnet publish ./KalkulatorAzure.csproj -c Release -o publish
+
 
       - name: Create ZIP from publish
         run: powershell Compress-Archive -Path publish\* -DestinationPath app.zip -Force
