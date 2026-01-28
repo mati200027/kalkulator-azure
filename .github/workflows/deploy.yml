@@ -42,5 +42,12 @@ jobs:
           $base64 = [Convert]::ToBase64String($bytes)
           $headers = @{ Authorization = "Basic $base64" }
 
-          $url = "${{ secrets.KUDU_URL }}/api/zipdeploy"
-          Invoke-RestMethod -Uri $url -Method POST -InFile "app.zip" -ContentType "application/zip" -Headers $headers
+          $base = "${{ secrets.KUDU_URL }}".TrimEnd('/')
+          $url  = "$base/api/zipdeploy"
+
+          Invoke-RestMethod `
+            -Uri $url `
+            -Method POST `
+            -InFile "app.zip" `
+            -ContentType "application/zip" `
+            -Headers $headers
