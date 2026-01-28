@@ -1,0 +1,13 @@
+{
+  "name": "kalkulator-ci",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:sass": "sass wwwroot/css/styles.scss wwwroot/css/styles.css --style=compressed",
+    "build:minify": "terser wwwroot/js/app.js -o wwwroot/js/app.min.js -c -m"
+  },
+  "devDependencies": {
+    "sass": "^1.69.0",
+    "terser": "^5.20.0"
+  }
+}
