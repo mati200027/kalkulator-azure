@@ -1,0 +1,46 @@
+name: CI/CD Kalkulator (GitHub Actions)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Frontend build (Sass + Minify)
+        run: |
+          npm install
+          npm run build:sass
+          npm run build:minify
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o publish
+
+      - name: Create ZIP from publish
+        run: powershell Compress-Archive -Path publish\* -DestinationPath app.zip -Force
+
+      - name: Deploy to Azure (Kudu ZIP Deploy)
+        shell: pwsh
+        run: |
+          $pair = "${{ secrets.KUDU_USER }}:${{ secrets.KUDU_PASSWORD }}"
+          $bytes = [System.Text.Encoding]::ASCII.GetBytes($pair)
+          $base64 = [Convert]::ToBase64String($bytes)
+          $headers = @{ Authorization = "Basic $base64" }
+
+          $url = "${{ secrets.KUDU_URL }}/api/zipdeploy"
+          Invoke-RestMethod -Uri $url -Method POST -InFile "app.zip" -ContentType "application/zip" -Headers $headers
