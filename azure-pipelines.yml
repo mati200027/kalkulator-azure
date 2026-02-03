@@ -1,0 +1,19 @@
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+  displayName: 'Instalacja Node.js'
+
+- script: |
+    npm install
+    npm run build:sass
+    npm run build:minify
+  displayName: 'KROK DODATKOWY: Kompilacja Sass i Minifikacja JS'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: true
+  displayName: 'Publikacja .NET 8.0'
